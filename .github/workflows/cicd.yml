@@ -25,5 +25,15 @@ jobs:
       - name: Run tests
         run: pytest
 
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+             registry: ghcr.io
+             username: ${{ github.actor }}
+             password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Docker image
-        run: docker build -t cicd-demo .
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/cicd-demo:latest .
+
+      - name: Push Docker image
+        run: docker push ghcr.io/${{ github.repository_owner }}/cicd-demo:latest
