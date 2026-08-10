@@ -48,3 +48,18 @@ jobs:
       # 7. Push Docker image to GHCR
       - name: Push Docker image
         run: docker push ghcr.io/priyanshulila/cicd-demo:latest
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull ghcr.io/priyanshulila/cicd-demo:latest
+            docker stop cicd-demo || true
+            docker rm cicd-demo || true
+            docker run -d \
+              --name cicd-demo \
+              -p 80:5000 \
+              ghcr.io/priyanshulila/cicd-demo:latest
